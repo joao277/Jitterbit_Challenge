@@ -80,4 +80,37 @@ async function getAllOrders() {
     }
 }
 
-module.exports = { createOrder, getOrderById, getAllOrders };
+async function updateOrder(orderId, order) {
+    const conn = await connection.getConnection();
+
+    try {
+        await conn.beginTransaction();
+
+        const [orders] = await conn.query('SELECT * FROM Orders WHERE orderId = ?', [orderId]);
+        if (orders.length === 0) {
+            await conn.rollback();
+            return null;
+        }
+
+        const sqlUpdateOrder = `UPDATE Orders SET value = ?, creationDate = ? WHERE orderId = ?`;
+        await conn.query(sqlUpdateOrder, [order.value, order.creationDate, orderId]);
+
+        await conn.query('DELETE FROM Items WHERE orderId = ?', [orderId]);
+
+        const sqlItem = `INSERT INTO Items (orderId, productId, quantity, price) VALUES (?, ?, ?, ?)`;
+        for (const item of order.items) {
+            await conn.query(sqlItem, [orderId, item.productId, item.quantity, item.price]);
+        }
+
+        await conn.commit();
+        return true;
+
+    } catch (err) {
+        await conn.rollback();
+        throw err;
+    } finally {
+        conn.release();
+    }
+}
+
+module.exports = { createOrder, getOrderById, getAllOrders, updateOrder };

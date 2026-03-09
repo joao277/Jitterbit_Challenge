@@ -33,4 +33,15 @@ async function getAllOrdersService() {
     return orders;
 }
 
-module.exports = { createOrderService, getOrderService, getAllOrdersService };
+async function updateOrderService(orderId, body) {
+    if (!orderId) throw new Error("Order ID inválido");
+
+    const mappedOrder = mapOrderRequest(body);
+
+    const result = await updateOrder(orderId, mappedOrder);
+    if (!result) throw new Error("Pedido não encontrado");
+
+    return orderId;
+}
+
+module.exports = { createOrderService, getOrderService, getAllOrdersService, updateOrderService };

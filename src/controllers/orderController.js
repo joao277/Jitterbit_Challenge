@@ -58,4 +58,35 @@ async function getAllOrdersController(req, res) {
     }
 }
 
-module.exports = { createOrderController, getOrderController, getAllOrdersController };
+async function updateOrderController(req, res) {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+
+    req.on('end', async () => {
+        try {
+            const parts = req.url.split('/');
+            const orderId = parts[2];
+
+            if (!orderId) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                return res.end(JSON.stringify({ error: 'Order ID não informado' }));
+            }
+
+            if (!body) throw new Error("Body vazio");
+
+            const jsonBody = JSON.parse(body);
+
+            await updateOrderService(orderId, jsonBody);
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: `Pedido ${orderId} atualizado com sucesso` }));
+
+        } catch (err) {
+            const status = err.message === 'Pedido não encontrado' ? 404 : 400;
+            res.writeHead(status, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: err.message }));
+        }
+    });
+}
+
+module.exports = { createOrderController, getOrderController, getAllOrdersController, updateOrderController };
