@@ -1,15 +1,10 @@
 const http = require('http');
+const { route } = require('./routes/index');
 
 const PORT = 3000;
 
 const server = http.createServer((req, res) => {
-
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-
-    res.end(JSON.stringify({
-        message: "API Order running"
-    }));
-
+    route(req, res);
 });
 
 server.listen(PORT, () => {
