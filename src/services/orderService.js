@@ -44,4 +44,13 @@ async function updateOrderService(orderId, body) {
     return orderId;
 }
 
-module.exports = { createOrderService, getOrderService, getAllOrdersService, updateOrderService };
+async function deleteOrderService(orderId) {
+    if (!orderId) throw new Error("Order ID inválido");
+
+    const result = await deleteOrder(orderId);
+    if (!result) throw new Error("Pedido não encontrado");
+
+    return orderId;
+}
+
+module.exports = { createOrderService, getOrderService, getAllOrdersService, updateOrderService, deleteOrderService };

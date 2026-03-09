@@ -1,4 +1,4 @@
-const { createOrderController, getOrderController, getAllOrdersController, updateOrderController } = require('../controllers/orderController');
+const { createOrderController, getOrderController, getAllOrdersController, updateOrderController, deleteOrderController } = require('../controllers/orderController');
 
 const orderRouter = {
     routes: [
@@ -21,6 +21,11 @@ const orderRouter = {
             method: 'PUT', 
             path: '/order/:id', 
             handler: updateOrderController 
+        },
+        { 
+            method: 'DELETE', 
+            path: '/order/:id', 
+            handler: deleteOrderController 
         }
 
     ]

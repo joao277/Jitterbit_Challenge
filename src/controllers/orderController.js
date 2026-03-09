@@ -89,4 +89,26 @@ async function updateOrderController(req, res) {
     });
 }
 
-module.exports = { createOrderController, getOrderController, getAllOrdersController, updateOrderController };
+async function deleteOrderController(req, res) {
+    try {
+        const parts = req.url.split('/');
+        const orderId = parts[2];
+
+        if (!orderId) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({ error: 'Order ID não informado' }));
+        }
+
+        await deleteOrderService(orderId);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: `Pedido ${orderId} deletado com sucesso` }));
+
+    } catch (err) {
+        const status = err.message === 'Pedido não encontrado' ? 404 : 400;
+        res.writeHead(status, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+    }
+}
+
+module.exports = { createOrderController, getOrderController, getAllOrdersController, updateOrderController, deleteOrderController };

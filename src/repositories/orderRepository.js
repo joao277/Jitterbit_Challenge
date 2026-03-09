@@ -113,4 +113,31 @@ async function updateOrder(orderId, order) {
     }
 }
 
-module.exports = { createOrder, getOrderById, getAllOrders, updateOrder };
+async function deleteOrder(orderId) {
+    const conn = await connection.getConnection();
+
+    try {
+        await conn.beginTransaction();
+
+        const [orders] = await conn.query('SELECT * FROM Orders WHERE orderId = ?', [orderId]);
+        if (orders.length === 0) {
+            await conn.rollback();
+            return null;
+        }
+
+        await conn.query('DELETE FROM Items WHERE orderId = ?', [orderId]);
+
+        await conn.query('DELETE FROM Orders WHERE orderId = ?', [orderId]);
+
+        await conn.commit();
+        return true;
+
+    } catch (err) {
+        await conn.rollback();
+        throw err;
+    } finally {
+        conn.release();
+    }
+}
+
+module.exports = { createOrder, getOrderById, getAllOrders, updateOrder, deleteOrder };
