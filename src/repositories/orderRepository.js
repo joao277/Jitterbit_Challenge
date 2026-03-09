@@ -23,4 +23,31 @@ async function createOrder(order) {
     }
 }
 
-module.exports = { createOrder };
+async function getOrderById(orderId) {
+    const conn = await connection.getConnection();
+    try {
+        const [orders] = await conn.query(
+            'SELECT * FROM Orders WHERE orderId = ?',
+            [orderId]
+        );
+
+        if (orders.length === 0) return null;
+        const order = orders[0];
+
+        const [items] = await conn.query(
+            'SELECT productId, quantity, price FROM Items WHERE orderId = ?',
+            [orderId]
+        );
+
+        return {
+            orderId: order.orderId,
+            value: order.value,
+            creationDate: order.creationDate,
+            items: items
+        };
+    } finally {
+        conn.release();
+    }
+}
+
+module.exports = { createOrder, getOrderById };

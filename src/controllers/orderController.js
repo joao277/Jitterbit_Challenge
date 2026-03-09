@@ -25,4 +25,25 @@ async function createOrderController(req, res) {
     });
 }
 
-module.exports = { createOrderController };
+async function getOrderController(req, res) {
+    try {
+        const parts = req.url.split('/');
+        const orderId = parts[2];
+
+        if (!orderId) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({ error: 'Order ID não informado' }));
+        }
+
+        const order = await getOrderService(orderId);
+        
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(order));
+    } catch (err) {
+        const status = err.message === 'Pedido não encontrado' ? 404 : 400;
+        res.writeHead(status, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+    }
+}
+
+module.exports = { createOrderController, getOrderController };
