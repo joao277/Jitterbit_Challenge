@@ -46,4 +46,16 @@ async function getOrderController(req, res) {
     }
 }
 
-module.exports = { createOrderController, getOrderController };
+async function getAllOrdersController(req, res) {
+    try {
+        const orders = await getAllOrdersService();
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(orders));
+    } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Erro ao buscar pedidos: ' + err.message }));
+    }
+}
+
+module.exports = { createOrderController, getOrderController, getAllOrdersController };

@@ -1,5 +1,4 @@
-const { createOrderController } = require('../controllers/orderController');
-const { createOrderController, getOrderController } = require('../controllers/orderController');
+const { createOrderController, getOrderController, getAllOrdersController } = require('../controllers/orderController');
 
 const orderRouter = {
     routes: [
@@ -12,6 +11,11 @@ const orderRouter = {
             method: 'GET',
             path: '/order/:id',
             handler: getOrderController
+        },
+        {
+            method: 'GET',
+            path: '/order/list',
+            handler: getAllOrdersController
         }
 
     ]

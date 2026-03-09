@@ -28,4 +28,9 @@ async function getOrderService(orderId) {
     };
 }
 
-module.exports = { createOrderService, getOrderService };
+async function getAllOrdersService() {
+    const orders = await getAllOrders();
+    return orders;
+}
+
+module.exports = { createOrderService, getOrderService, getAllOrdersService };

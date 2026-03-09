@@ -50,4 +50,34 @@ async function getOrderById(orderId) {
     }
 }
 
-module.exports = { createOrder, getOrderById };
+async function getAllOrders() {
+    const conn = await connection.getConnection();
+    try {
+        const [orders] = await conn.query('SELECT * FROM Orders');
+
+        const results = [];
+        for (const order of orders) {
+            const [items] = await conn.query(
+                'SELECT productId, quantity, price FROM Items WHERE orderId = ?',
+                [order.orderId]
+            );
+
+            results.push({
+                orderId: order.orderId,
+                value: order.value,
+                creationDate: order.creationDate,
+                items: items.map(item => ({
+                    productId: item.productId,
+                    quantity: item.quantity,
+                    price: item.price
+                }))
+            });
+        }
+
+        return results;
+    } finally {
+        conn.release();
+    }
+}
+
+module.exports = { createOrder, getOrderById, getAllOrders };
